@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pady's cubing calculator</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+
+        <div class="container">
+            <h1>BPA / WPA calculator</h1>
+            <form id="calculatorForm">
+                <input type="text" id="inputValue" placeholder="Enter a decimal number" autocomplete="off">
+                <button type="submit">Add time</button>
+            </form>
+            <button id="deleteLast">Delete time</button>
+            <div id="listContainer">
+                <ul id="decimalList"></ul>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+
+        <div class="container">
+            <div id="listContainer">
+                <ul id="decimalList"></ul>
+            </div>
+
+            <div class="container">
+                <div id="statsTable">
+                    <table>
+                        <tr>
+                            <td>Average</td>
+                            <td>Best possible average</td>
+                            <td>Worst possible average</td>
+                        </tr>
+                        <tr>
+                            <td id="average" type="text"></td>
+                            <td id="bpa" type="text"></td>
+                            <td id="wpa" type="text"></td>
+                        </tr>
+                    </table> 
+
+                </div>
+            </div>
+
+    </body>
+</html>
