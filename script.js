@@ -32,12 +32,26 @@ document.getElementById('deleteLast').addEventListener('click', function() {
         decimalList.pop();
         // Display the updated list
         displayList();
-    } else {
-        alert("The list is already empty.");
-    }
+    } 
+    // else {
+    //     alert("The list is already empty.");
+    // }
     calculate();
 });
 
+document.getElementById('resetTimes').addEventListener('click', function() {
+    // Check if the list is not empty
+    if (decimalList.length > 0) {
+        // Remove the last item from the list
+        decimalList = [];
+        // Display the updated list
+        displayList();
+    } 
+    // else {
+    //     alert("The list is already empty.");
+    // }
+    calculate();
+});
 
 function displayList() {
     let listContainer = document.getElementById('listContainer');
