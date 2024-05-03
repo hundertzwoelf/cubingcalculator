@@ -1,16 +1,17 @@
 // Initialize an empty array to store decimal numbers
-let decimalList = [];
+let timeList = [];
 
 document.getElementById('calculatorForm').addEventListener('submit', function(event) {
     event.preventDefault();
-    let inputValue = parseFloat(document.getElementById('inputValue').value);
+    // let inputValue = parseFloat(document.getElementById('inputValue').value);
+    let inputValue = parseInt(document.getElementById('inputValue').value);
 
     // Check if inputValue is a valid number
-    if (!isNaN(inputValue)) {
+    if (isValidTime(inputValue)) {
         // Check if the list has already reached its maximum length
-        if (decimalList.length < 5) {
+        if (timeList.length < 5) {
             // Add the input value to the list
-            decimalList.push(inputValue);
+            timeList.push(convertTimeToRaw(inputValue));
             // Display the updated list
             displayList();
             // Clear input field
@@ -19,17 +20,16 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
             alert("The list is already at its maximum length of 5.");
         }
 
-    } else {
-        alert("Please enter a valid decimal number.");
     }
+
     calculate();
 });
 
 document.getElementById('deleteLast').addEventListener('click', function() {
     // Check if the list is not empty
-    if (decimalList.length > 0) {
+    if (timeList.length > 0) {
         // Remove the last item from the list
-        decimalList.pop();
+        timeList.pop();
         // Display the updated list
         displayList();
     } 
@@ -41,9 +41,9 @@ document.getElementById('deleteLast').addEventListener('click', function() {
 
 document.getElementById('resetTimes').addEventListener('click', function() {
     // Check if the list is not empty
-    if (decimalList.length > 0) {
+    if (timeList.length > 0) {
         // Remove the last item from the list
-        decimalList = [];
+        timeList = [];
         // Display the updated list
         displayList();
     } 
@@ -62,53 +62,108 @@ function displayList() {
     let ul = document.createElement('ul');
 
     // Iterate through the decimalList and create list items for each value
-    decimalList.forEach(function(value) {
+    timeList.forEach(function(value) {
         let li = document.createElement('li');
-        li.textContent = value;
+        
+        // console.log(value)
+        // console.log(convertRawToTime(value))
+        // console.log(convertTimeToString(convertRawToTime(value)))
+        li.textContent = convertTimeToString(convertRawToTime(value))
         ul.appendChild(li);
     });
 
     // Append the unordered list to the list container
     listContainer.appendChild(ul);
+
+    // Reset avg, bpa, wpa displays
+    document.getElementById("average").innerHTML = ""
+    document.getElementById("bpa").innerHTML = ""
+    document.getElementById("wpa").innerHTML = ""
+}
+
+function isValidTime(input) {
+    if (isNaN(input)) {
+        alert("Please enter a number.")
+        return false
+    } else if (input > 95999) {
+        alert("Please enter a valid time under 10 minutes.");
+        return false
+    }
+
+    seconds = Math.floor(input / 100) % 100
+
+    if (seconds > 59) {
+        alert("Please enter a correct time (seconds < 60).")
+        return false
+    }
+
+    return true
+}
+
+// converts 12345 -> "1:23.45"
+function convertTimeToString(time) {
+    let displayValue = String(time)
+    if (displayValue.length == 2) {
+        displayValue = "0." + displayValue.slice(-2)
+    } else if (displayValue.length == 3) {
+        displayValue = displayValue.slice(0, 1) + "." + displayValue.slice(-2)
+    } else if (displayValue.length == 4) {
+        displayValue = displayValue.slice(0, 2) + "." + displayValue.slice(-2)
+    } else if (displayValue.length == 5) {
+        displayValue = displayValue.slice(0, 1) + ":" + displayValue.slice(1, 3) + "." + displayValue.slice(-2)
+    }
+    return displayValue
+}
+
+// converts 12345 -> 8345
+function convertTimeToRaw(time) {
+    let minutes = Math.floor(time/10000) // 12345 -> 1
+    let centiseconds = time % 10000 // 12345 -> 2345
+
+    result = 6000 * minutes + centiseconds // 12345 -> 8345
+    return result
+}
+
+// converts 8345 -> 12345
+function convertRawToTime(raw){
+    let minutes = Math.floor(raw / 6000)
+    let centiseconds = raw - (minutes * 6000)
+
+    let result = minutes * 10000 + centiseconds
+    return result
 }
 
 function calculate() {
-    let bestTime = 0;
-    let worstTime = 0;
+    if (!((timeList.length == 4) || (timeList.length == 5))) {
+        return
+    }
 
-    let avgText = '';
-    let bpaText = '';
-    let wpaText = '';
+    bestTime = Math.min(...timeList);
+    worstTime = Math.max(...timeList);
 
-    if (decimalList.length == 4) {
-        bestTime = Math.min(...decimalList);
-        worstTime = Math.max(...decimalList);
-
-        let sum = decimalList[0] + decimalList[1] + decimalList[2] + decimalList[3];
+    if (timeList.length == 4) {
+        let sum = timeList[0] + timeList[1] + timeList[2] + timeList[3];
         let bpaSum = sum - worstTime;
         let wpaSum = sum - bestTime;
 
-        let bpaMean = Math.round(bpaSum / 3 * 100) / 100;
-        let wpaMean = Math.round(wpaSum / 3 * 100) / 100;
+        let bpa = Math.round(bpaSum / 3);
+        let wpa = Math.round(wpaSum / 3);
 
-        bpaText = bpaMean.toFixed(2);
-        wpaText = wpaMean.toFixed(2);
+        document.getElementById("average").innerHTML = "";
+        document.getElementById("bpa").innerHTML = convertTimeToString(convertRawToTime(bpa));
+        document.getElementById("wpa").innerHTML = convertTimeToString(convertRawToTime(wpa));
 
-    } else if (decimalList.length == 5) {
-        let bestTime = Math.min(...decimalList);
-        let worstTime = Math.max(...decimalList);
-
-        let sum = decimalList[0] + decimalList[1] + decimalList[2] + decimalList[3] + decimalList[4];
+    } else if (timeList.length == 5) {
+        let sum = timeList[0] + timeList[1] + timeList[2] + timeList[3] + timeList[4];
         let avgSum = sum - bestTime - worstTime;
 
-        let avgMean = Math.round(avgSum / 3 * 100) / 100;
+        let avg = Math.round(avgSum / 3)
 
-        avgText = avgMean.toFixed(2);
-
+        document.getElementById("average").innerHTML = convertTimeToString(convertRawToTime(avg));
     }  
 
     // Reset
-    document.getElementById("average").innerHTML = avgText;
-    document.getElementById("bpa").innerHTML = bpaText;
-    document.getElementById("wpa").innerHTML = wpaText;
+    // document.getElementById("average").innerHTML = convertTimeToString(convertRawToTime(avg));
+    // document.getElementById("bpa").innerHTML = convertTimeToString(convertRawToTime(bpa));
+    // document.getElementById("wpa").innerHTML = convertTimeToString(convertRawToTime(wpa));
 }
