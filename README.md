@@ -1,6 +1,6 @@
 # Pady's Cubing Calculator
 
-Employed at https://hundertzwoelf.github.io/cubingcalculator/
+Deployed at https://hundertzwoelf.github.io/cubingcalculator/
 
 Simple average calculator to find out BPA's and WPA's, as well as the final
 average of 5.
